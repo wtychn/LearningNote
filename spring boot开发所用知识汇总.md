@@ -1,7 +1,13 @@
 # Spring Boot开发所用杂项工具汇总
 Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行实际项目练手时，写篇文章总结一下近期的一些学习心得，也作为一个备忘录能够及时回顾。
+## web服务原理
+### Servlet原理
+图片源自[狂神的JavaWeb入门到实战](https://www.bilibili.com/video/BV12J411M7Sj?p=9)
+![servelet](https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165223.png)
 ## 服务器
-通常来讲，只要运行在服务器系统之上，绑定了服务器IP地址并且在某一个端口监听用户请求并提供服务的软件都可以叫服务器软件。
+通常来讲，只要运行在服务器系统之上，绑定了服务器IP地址并且在某一个端口监听用户请求并提供服务的软件都可以叫服务器软件，其更像是一个容器的概念，包含了请求所需的资源容器。
+![web服务原理](https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165636.png)
+图片源自[狂神的JavaWeb入门到实战](https://www.bilibili.com/video/BV12J411M7Sj?p=9)
 
 目前能使用到的Web服务器就是`Nginx`和`Tomcat`，接下来就这两个软件分开说一下。
 ### Tomcat
