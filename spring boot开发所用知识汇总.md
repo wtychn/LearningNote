@@ -4,6 +4,7 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 ### Servlet原理
 图片源自[狂神的JavaWeb入门到实战](https://www.bilibili.com/video/BV12J411M7Sj?p=9)
 ![servelet](https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165223.png)
+
 ### MVC架构
 ![MVC](https://gitee.com/wtychn/ImageBed/raw/master/img/20200904160121.png)
 **M**odle
@@ -18,6 +19,16 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 - 接收用户请求
 - 交给业务层对应代码
 - 控制视图跳转
+
+## Cookie & Session
+二者的区别：
+- `session`存储空间比`cookie`大。
+- `session`存储在服务器端，而`cookie`则存储在客户端，你可以在C盘中找到本机存储的`cookie`。
+
+所以一般使用`cookie`来存储`session`的`id`，相当于`cookie`是打开`session`这个保险柜的钥匙。
+![cookie](https://gitee.com/wtychn/ImageBed/raw/master/img/20200825232221.png)
+![session](https://gitee.com/wtychn/ImageBed/raw/master/img/20200825233220.png)
+
 ## 服务器
 通常来讲，只要运行在服务器系统之上，绑定了服务器IP地址并且在某一个端口监听用户请求并提供服务的软件都可以叫服务器软件，其更像是一个容器的概念，包含了请求所需的资源容器。
 ![web服务原理](https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165636.png)
