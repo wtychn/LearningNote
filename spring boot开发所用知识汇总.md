@@ -56,6 +56,17 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 2. 当用户第二次访问的时候，被分配到了`tomcat_8222`上
 3. 那么此时`tomcat_8222`就会从`Redis`去获取相关信息，一看有对应信息，那么就会呈现登陆状态。
 ![session共享](https://gitee.com/wtychn/ImageBed/raw/master/img/6660.png)
+
+## SpringBoot
+### 自动装配原理
+1. 整合JavaEE、解决方案、和自动配置所涉及的都在`spring-boot-autoconfigure-2.3.3.RELEASE.jar`包下   
+2. `SpringBoot`在启动时，从类路径`/META-INF/spring.factories`下获取指定的值（以`url`形式存储）
+3. 将这些自动配置类导入容器，将所有需要导入的组件以类名的方式返回，这些组件就会被添加到容器中
+4. 容器中也会存在很多命名为`xxxAutoConfigure`的文件（`@Bean`），就是这些文件给容器中导入了这个场景所需要的所有组件
+5. 给容器中自动配置类添加组件的时候,会从`xxxproperties`类中获取某些属性。我们只需要在配置文件中指定这些属性的值即可
+
+>`xxxAutoConfigurartion`: 自动配置类; 给容器中添加组件  
+`xxxProperties`: 封装配置文件中相关属性
 ## 安全框架
 安全框架主要用于登录、权限等操作。
 ### Shiro
