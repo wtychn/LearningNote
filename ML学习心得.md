@@ -20,3 +20,4 @@
   5. `ELU`（融合`sigmoid`和`ReLU`）![ELU](https://gitee.com/wtychn/ImageBed/raw/master/img/20200622094851.png)
 - **欠拟合**：训练的特征少，误差较大
 - **过拟合**：训练特征维度多，使得拟合函数完美接近训练集，但是泛化能力差，实际预测能力不足。![欠拟合和过拟合](https://gitee.com/wtychn/ImageBed/raw/master/img/20200622100002.png)
+- **优化器**：大部分时间可以选择`Adam`，可以又快又好地完成训练

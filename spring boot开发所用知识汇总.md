@@ -3,19 +3,23 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 ## web服务原理
 ### Servlet原理
 图片源自[狂神的JavaWeb入门到实战](https://www.bilibili.com/video/BV12J411M7Sj?p=9)
-![servelet](https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165223.png)
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165223.png" alt="servelet" style="zoom:50%;" />
 
 ### MVC架构
-![MVC](https://gitee.com/wtychn/ImageBed/raw/master/img/20200904160121.png)
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200904160121.png" alt="MVC" style="zoom:50%;" />
 **M**odle
+
 - 业务处理（Service）
 - CRUD持久层  
   
+
 **V**iew
 - 展示数据
 - 提供链接发起Servlet请求
-    
+  
+
 **C**ontroller
+
 - 接收用户请求
 - 交给业务层对应代码
 - 控制视图跳转
@@ -25,13 +29,15 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 - `session`存储空间比`cookie`大。
 - `session`存储在服务器端，而`cookie`则存储在客户端，你可以在C盘中找到本机存储的`cookie`。
 
-所以一般使用`cookie`来存储`session`的`id`，相当于`cookie`是打开`session`这个保险柜的钥匙。
-![cookie](https://gitee.com/wtychn/ImageBed/raw/master/img/20200825232221.png)
-![session](https://gitee.com/wtychn/ImageBed/raw/master/img/20200825233220.png)
+所以一般使用`cookie`
+
+来存储`session`的`id`，相当于`cookie`是打开`session`这个保险柜的钥匙。
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200825232221.png" alt="cookie" style="zoom: 33%;" />
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200825233220.png" alt="session" style="zoom: 33%;" />
 
 ## 服务器
 通常来讲，只要运行在服务器系统之上，绑定了服务器IP地址并且在某一个端口监听用户请求并提供服务的软件都可以叫服务器软件，其更像是一个容器的概念，包含了请求所需的资源容器。
-![web服务原理](https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165636.png)
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165636.png" alt="web服务原理" style="zoom: 50%;" />
 图片源自[狂神的JavaWeb入门到实战](https://www.bilibili.com/video/BV12J411M7Sj?p=9)
 
 目前能使用到的Web服务器就是`Nginx`和`Tomcat`，接下来就这两个软件分开说一下。
@@ -41,7 +47,7 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 `Nginx`是一个典型的**HTTP服务器**，它原本的本职工作就是将服务端的某一个静态内容或资源通过`HTTP`协议传到客户端，所以也就是典型的静态服务器。
 
 现实应用部署场景中，`Nginx`一般是与后面真正的动态应用服务器打配合，比如`Tomcat`，把用户请求转发给后面的应用服务器，从而提供灵活稳定的Web服务，而这种转发就是所谓的**反向代理**。因为`Nginx`服务器性能好，稳定性也高，能扛得住冲击，把它放在前面去直面用户。
-![Nginx](https://gitee.com/wtychn/ImageBed/raw/master/img/Nginx.jpg)
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/Nginx.jpg" alt="Nginx" style="zoom: 33%;" />
 那么为什么需要反向代理呢？因为`Nginx`在处理静态文件的吞吐量上面比`Tomcat`好很多，所以通常他们俩配合，不会把所有的请求都如本例所示的交给`Tomcat`, 而是把静态请求交给`Nginx`，动态请求，如`jsp`,`servlet`,`ssm`,`struts`等请求交给`Tomcat`. 从而达到**动静分离**的效果。
 
 当访问量很大的时候，一个`Tomcat`吃不消了，这时候就准备多个`Tomcat`，由`Nginx`按照权重来对请求进行分配，从而缓解单独一个`Tomcat`受到的压力。这就叫做**负载均衡**。
@@ -55,7 +61,7 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 1. 用户提交账号密码的行为被分配在了`tomcat_8111`上，登陆信息被存放在`Redis`里。
 2. 当用户第二次访问的时候，被分配到了`tomcat_8222`上
 3. 那么此时`tomcat_8222`就会从`Redis`去获取相关信息，一看有对应信息，那么就会呈现登陆状态。
-![session共享](https://gitee.com/wtychn/ImageBed/raw/master/img/6660.png)
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/6660.png" alt="session共享" style="zoom:50%;" />
 
 ## SpringBoot
 ### 自动装配原理
@@ -75,6 +81,11 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 但是使用 Shiro 这个安全框架之后，大家做权限的方式都一致化了，这样的好处就是你的代码我看起来容易，我的代码你也好理解。
 
 Shiro 也比较成熟，基本上能满足大部分的权限需要。
+
+## 容器化
+### Docker
+常用基础命令
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200929100309.png" alt="docker命令" style="zoom:50%;" />
 
 >引用文章：
 - [服务器软件大盘点！ - CodeSheep - 掘金专栏](https://juejin.im/post/5e8409f9f265da47f144a07a#heading-12)
