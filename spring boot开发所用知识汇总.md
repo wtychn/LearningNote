@@ -32,8 +32,8 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 所以一般使用`cookie`
 
 来存储`session`的`id`，相当于`cookie`是打开`session`这个保险柜的钥匙。
-<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200825232221.png" alt="cookie" style="zoom: 33%;" />
-<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200825233220.png" alt="session" style="zoom: 33%;" />
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200825232221.png" alt="cookie" style="zoom: 50%;" />
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200825233220.png" alt="session" style="zoom: 49%;" />
 
 ## 服务器
 通常来讲，只要运行在服务器系统之上，绑定了服务器IP地址并且在某一个端口监听用户请求并提供服务的软件都可以叫服务器软件，其更像是一个容器的概念，包含了请求所需的资源容器。
@@ -64,6 +64,11 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 <img src="https://gitee.com/wtychn/ImageBed/raw/master/img/6660.png" alt="session共享" style="zoom:50%;" />
 
 ## SpringBoot
+
+### IOC
+
+IOC(Inversion of Control)，控制反转的核心思想在于，**资源（bean）的使用不由使用各自管理，而是交给不使用资源的第三方进行管理（容器）**。这样的好处是资源是集中管理的，可配置、易维护，同时也降低了双方的依赖度做到了低耦合。
+
 ### 自动装配原理
 1. 整合JavaEE、解决方案、和自动配置所涉及的都在`spring-boot-autoconfigure-2.3.3.RELEASE.jar`包下   
 2. `SpringBoot`在启动时，从类路径`/META-INF/spring.factories`下获取指定的值（以`url`形式存储）
