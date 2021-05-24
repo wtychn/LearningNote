@@ -4,24 +4,26 @@ Java 有关多线程的相关知识总结。
 
 ## 相关概念
 
-### 1. 进程与线程
+### 1. 基础
+
+#### 1.1 进程与线程
 
 线程是进程划分成的更小的运行单位。线程和进程最大的不同在于基本上各进程是独立的，而各线程则不一定，因为同一进程中的线程极有可能会相互影响。线程执行开销小，但不利于资源的管理和保护；而进程正相反。
 
 他们两个本质的区别是**是否单独占有内存地址空间及其它系统资源（比如I/O）**
 
-### 2. 程序计数器、虚拟机栈、本地方法栈为什么是线程私有的？
+#### 1.2 程序计数器、虚拟机栈、本地方法栈为什么是线程私有的？
 
 程序计数器私有主要是为了**线程切换后能恢复到正确的执行位置**；
 
 为了**保证线程中的局部变量不被别的线程访问到**，虚拟机栈和本地方法栈是线程私有的。
 
-### 3. 并发与并行
+#### 1.3 并发与并行
 
 - **并发：** 同一时间段，多个任务都在执行 (单位时间内不一定同时执行)；
 - **并行：** 单位时间内，多个任务同时执行。
 
-## 线程的生命周期和状态
+### 2. 线程的生命周期和状态
 
 <img src="https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/19-1-29/Java%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81.png" alt="Java 线程的状态 " style="zoom: 80%;" />
 
@@ -33,7 +35,7 @@ Java 有关多线程的相关知识总结。
 
 操作系统隐藏 Java 虚拟机（JVM）中的 READY 和 RUNNING 状态，它只能看到 RUNNABLE 状态，所以 Java 系统一般将这两个状态统称为 **RUNNABLE（运行中）** 状态 。
 
-#### 1. sleep() 方法和 wait() 方法区别和共同点
+#### 2.1 sleep() 方法和 wait() 方法区别和共同点
 
 这两个方法都能使线程暂停执行。
 
@@ -43,15 +45,15 @@ Java 有关多线程的相关知识总结。
 | 用途 | 暂停执行 | 线程间交互/通信 |
 | 苏醒 | `sleep()`执行完线程自动苏醒 | 需要别的线程调用`notify()`或`notifyAll()`方法使其苏醒，或者使用`wait(long timeout)`使其超时后自动苏醒 |
 
-#### 2. 调用 start() 方法时会执行 run() 方法，为什么不能直接调用 run() 方法？
+#### 2.2 调用 start() 方法时会执行 run() 方法，为什么不能直接调用 run() 方法？
 
 new 一个 Thread，线程进入了新建状态。调用 `start()`方法，会启动一个线程并使线程进入了就绪状态，当分配到时间片后就可以开始运行了。 `start()` 会执行线程的相应准备工作，然后自动执行 `run()` 方法的内容，这是真正的多线程工作。 但是，直接执行 `run()` 方法，会把 `run()` 方法当成一个 main 线程下的普通方法去执行，并不会在某个线程中执行它，所以这并不是多线程工作。
 
 **总结： 调用 `start()` 方法方可启动线程并使线程进入就绪状态，直接执行 `run()` 方法的话不会以多线程的方式执行。**
 
-## 多线程中可能出现的问题
+### 3. 多线程中可能出现的问题
 
-### 1. 上下文切换
+#### 3.1 上下文切换
 
 多线程编程中一般线程的个数都大于 CPU 核心的个数，而一个 CPU 核心在任意时刻只能被一个线程使用，为了让这些线程都能得到有效执行，CPU 采取的策略是为每个线程分配时间片并轮转的形式。当一个线程的时间片用完的时候就会重新处于就绪状态让给其他线程使用，这个过程就属于一次上下文切换。
 
@@ -61,9 +63,9 @@ new 一个 Thread，线程进入了新建状态。调用 `start()`方法，会�
 
 Linux 相比与其他操作系统（包括其他类 Unix 系统）有很多的优点，其中有一项就是，其上下文切换和模式切换的时间消耗非常少。
 
-### 2. 死锁
+#### 3.2 死锁
 
-#### 2.1 死锁产生条件
+##### 3.2.1 死锁产生条件
 
 1. 互斥条件：该资源任意一个时刻只由一个线程占用。
 2. 请求与保持条件：一个进程因请求资源而阻塞时，对已获得的资源保持不放。
@@ -120,9 +122,7 @@ Thread[线程 1,5,main]waiting get resource2
 Thread[线程 2,5,main]waiting get resource1
 ```
 
-
-
-#### 2.2 如何避免死锁
+##### 3.2.2 如何避免死锁
 
 1. 破坏互斥条件 ：这个条件我们没有办法破坏，因为我们用锁本来就是想让他们互斥的（临界资源需要互斥访问）。
 2. 破坏请求与保持条件 ：一次性申请所有的资源。
@@ -184,16 +184,16 @@ Thread[线程 2,5,main]get resource2
 Process finished with exit code 0
 ```
 
-## 锁
+### 4. 锁
 
 <img src="https://img-blog.csdnimg.cn/20190514175454461.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MDc0MzI2MQ==,size_16,color_FFFFFF,t_70" alt="锁分类" style="zoom: 80%;" />
 
-### 1. 悲观锁/乐观锁
+#### 4.1 悲观锁/乐观锁
 
 - 悲观锁：我们假设在多线程使用同一资源时会互相抢占资源，这种态度引起的措施叫悲观锁。悲观锁一般用`synchronized`或者`Lock`来加锁。
 - 乐观锁：在使用资源时认为其他资源不会抢占资源，就不用使用加锁的方式，这就是乐观锁，一般使用 CAS 算法处理。
 
-### 2. 互斥锁/自旋锁
+#### 4.2 互斥锁/自旋锁
 
 自旋锁与互斥锁比较类似，它们都是为了解决对某项资源的互斥使用。无论是互斥锁，还是自旋锁，在任何时刻，最多只能有一个保持者，也就说，在任何时刻最多只能有一个执行单元获得锁。但是两者在调度机制上略有不同。
 
@@ -206,7 +206,7 @@ Process finished with exit code 0
 
 自旋锁只有在内核可抢占或 SMP（多处理器）的情况下才真正需要，在单CPU且不可抢占的内核下，自旋锁的所有操作都是空操作。
 
-### 3. 公平锁/非公平锁
+#### 4.3 公平锁/非公平锁
 
 - 公平锁是指多个线程按照申请锁的顺序来获取锁。
 - 非公平锁是指多个线程获取锁的顺序并不是按照申请锁的顺序，有可能后申请的线程比先申请的线程优先获取锁。有可能，会造成优先级反转或者饥饿现象。
@@ -215,7 +215,7 @@ Process finished with exit code 0
 
 对于`Synchronized`而言，也是一种非公平锁。由于其并不像`ReentrantLock`是通过 AQS 的来实现线程调度，所以并没有任何办法使其变成公平锁。
 
-### 4. 可重入锁
+#### 4.4 可重入锁
 
 可重入锁又名递归锁，是指在同一个线程在外层方法获取锁的时候，在进入内层方法会自动获取锁。
 
@@ -232,7 +232,7 @@ synchronized void setB() throws Exception{
 
 上面的代码就是一个可重入锁的一个特点，如果不是可重入锁的话，`setB()`可能不会被当前线程执行，可能造成死锁。
 
-### 5. 排他锁/共享锁
+#### 4.5 排他锁/共享锁
 
 - 排他锁是指该锁一次只能被一个线程所持有。
 - 共享锁是指该锁可被多个线程所持有。
@@ -245,11 +245,160 @@ synchronized void setB() throws Exception{
 
 对于`Synchronized`而言，当然是排他锁。
 
-### 6. 偏向锁/轻量级锁/重量级锁
+#### 4.6 偏向锁/轻量级锁/重量级锁
 
 这三种锁是指锁的状态，并且是针对`Synchronized`。在 Java 5 通过引入锁升级的机制来实现高效`Synchronized`。这三种锁的状态是通过对象监视器在对象头中的字段来表明的。
 
 - 偏向锁是指一段同步代码一直被一个线程所访问，那么该线程会自动获取锁。降低获取锁的代价。
 - 轻量级锁是指当锁是偏向锁的时候，被另一个线程所访问，偏向锁就会升级为轻量级锁，其他线程会通过自旋的形式尝试获取锁，不会阻塞，提高性能。
 - 重量级锁是指当锁为轻量级锁的时候，另一个线程虽然是自旋，但自旋不会一直持续下去，当自旋一定次数的时候，还没有获取到锁，就会进入阻塞，该锁膨胀为重量级锁。重量级锁会让其他申请的线程进入阻塞，性能降低。
+
+## 实际操作
+
+### 1. 线程创建
+
+#### 1.1 继承 Theard 类并重写 run 方法
+
+```java
+public class ThreadTest {
+    // 继承Thread类并重写run方法
+    public static class MyThread extends Thread {
+        @Override
+        public void run() {
+            System.out.println("I am a child Thread");
+        }
+    }
+ 
+    public static void main(String[] args) {
+        // 创建线程
+        MyThread thread = new MyThread();
+        // 启动线程
+        thread.start();
+    }
+}
+```
+
+- 优点：可以直接在 run 方法中使用 this 获取当前线程，不需要使用 Thread.currentThread() 方法。
+- 缺点：不支持多继承；任务与代码没有分离，多个线程执行相同任务时需要多份代码；没有返回值。
+
+#### 1.2 实现 Runnable 接口的 run 方法
+
+```java
+
+public class ThreadTest {
+    public static class RunnableTask implements Runnable {
+        @Override
+        public void run() {
+            System.out.println("I am a child Thread implements Runnable");
+        }
+    }
+ 
+    public static void main(String[] args) {
+        RunnableTask task = new RunnableTask();
+        new Thread(task).start();
+        new Thread(task).start();
+    }
+}
+```
+
+- 优点：如代码所示，可以共用 task 代码逻辑。
+- 缺点：没有返回值。
+
+#### 1.3 FutureTask
+
+```java
+// 创建任务类，类似Runnable
+public class CallerTask implements Callable<String> {
+    @Override
+    public String call() throws Exception {
+        return "hello";
+    }
+ 
+    public static void main(String[] args) {
+        // 创建异步任务
+        FutureTask<String> futureTask = new FutureTask<>(new CallerTask());
+        // 启动线程
+        new Thread(futureTask).start();
+        try {
+            // 等待任务执行完毕，并返回结果
+            String result = futureTask.get();
+            System.out.println(result);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+优点：可以拿到返回值。
+
+### 2. TheadLocal
+
+```java
+public class ThreadLocalTest {
+    // (1) print函数
+    static void print(String str) {
+        // 1.1 打印当前线程本地内存中的localVariable变量的值
+        System.out.println(str + ":" + localVariable.get());
+        // 1.2 清除当前线程本地内存中的localVariable变量
+        localVariable.remove();
+    }
+    // (2) 创建ThreadLocal变量
+    static ThreadLocal<String> localVariable = new ThreadLocal<>();
+ 
+    public static void main(String[] args) {
+        // (3) 创建线程one
+        Thread threadOne = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // 3.1 设置线程One中本地变量localVariable的值
+                localVariable.set("threadOne local variable");
+                // 3.2 调用打印函数
+                print("threadOne");
+                // 3.3 打印本地变量值
+                System.out.println("threadOne remove after" + ":" + localVariable.get());
+            }
+        });
+        // (4) 创建线程two
+        Thread threadTwo = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // 4.1 设置线程Two中本地变量localVariable的值
+                localVariable.set("threadTwo local variable");
+                // 4.2 调用打印函数
+                print("threadTwo");
+                // 4.3 打印本地变量值
+                System.out.println("threadTwo remove after" + ":" + localVariable.get());
+            }
+        });
+        // (5) 启动线程
+        threadOne.start();
+        threadTwo.start();
+ 
+    }
+}
+```
+
+执行结果：
+
+```
+threadOne:threadOne local variable
+threadOne remove after:null
+threadTwo:threadTwo local variable
+threadTwo remove after:null
+```
+
+
+
+#### 2.1 原理
+
+创建了一个 ThreadLocal 变量后，访问这个变量的每个线程都会有个这个变量的本地副本。实现方式是在每个线程内部有个名为 threadLocals 的 HashMap，其中 key 为我们定义的 ThreadLocal 变量的 this 引用，value 则为我们使用 set 方法设置的值。
+
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/image-20210524160356061.png" alt="image-20210524160356061" style="zoom:50%;" />
+
+#### 2.2 InheritableThreadLocal
+
+使子线程可以使用父线程中设置的本地变量。
 
