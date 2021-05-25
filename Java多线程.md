@@ -402,3 +402,5 @@ threadTwo remove after:null
 
 使子线程可以使用父线程中设置的本地变量。
 
+### 3. synchronized
+
