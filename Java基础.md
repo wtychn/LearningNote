@@ -168,3 +168,67 @@ NIO 有三个实体，缓冲区 Buffer、通道 Channel、多路复用器 Select
 但是，服务端需要主动通知客户端，关于“通知”的业务逻辑肯定是需要消耗资源的。客户端本来在做别的事情，突然前面的事情又插过来要做了，必然引入了一个多线程的协调工作。
 
 AIO 目前的实际应用仍然较少。
+
+## 5. 集合
+
+### 5.1 HashMap
+
+#### 5.1.1 Java  8 之前
+
+所有发生哈希冲突的数据会被放在同一条**链表**中。
+
+存放 Entry<K, V> 链表的 table 数组初始大小为 16.
+
+table 数组的长度始终保持为 2 的幂次方。
+
+##### 1) hash()
+
+1. 首先求对象的 hashCode；
+2. 将 hashCode 进行分散（1.8 之前的散列算法较为复杂，不详细描述）
+
+##### 2) indexFor
+
+根据 hashCode 和 table 数组长度计算存放下标。计算方式：
+
+```
+h & (length - 1)
+```
+
+注意：table 数组的长度始终保持为 2 的幂次方的好处是通过下标计算后的结果为 hashCode 对数组长度取余。
+
+##### 3) put()
+
+插入键值对时确认对象是否相等，HashMap 判定是同一个对象的条件：hashCode 一致，且 equals 比对一致的对象。
+
+因此修改 equal() 方法时需要先修改 hashCode() 方法。
+
+##### 4) resize()
+
+扩容公式：
+
+```
+threshold = size * loadFactor
+```
+
+其中 threshold 为扩展后的阈值，size 为当前 table 长度，loadFactor 为负载因子（默认 0.75）。
+
+当 size 达到 threshold 之后就将 size * 2，并使用 transfer() 方法遍历所有键值对重新计算下标。
+
+#### 5.1.2 Java 8 
+
+链表长度大于等于 7 时转为红黑树。
+
+##### 1) hash()
+
+计算方式简化为`h >>> 16`
+
+##### 2) resize()
+
+取消了 transfer() 方法，全都在 resize() 中完成。
+
+优化为：当重新计算出的下标未超出旧容量的链表，即`hash & oldCap == 0`的部分不做处理；超出的部分：新下标 = 原下标 + 旧容量
+
+<img src="https://img-blog.csdnimg.cn/20181105181728652.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dvc2hpbWF4aWFvMQ==,size_16,color_FFFFFF,t_70" alt="hashmap流程图" style="zoom:50%;" />
+
+图中有一处错误：链表长度不是大于 8 转红黑树，而是大于等于 7 时转红黑树。
+
