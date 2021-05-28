@@ -92,7 +92,7 @@ Java 中实现多态有两种方式：
 
 ### 2.2 final
 
-可以用于修饰变量、方法和类，分别表示变量不可变、方法不可覆盖、类不可被继承：
+可以用于修饰变量、方法和类，分别表示**变量不可变、方法不可覆盖、类不可被继承**：
 
 - 变量：如果是基本数据类型，则初始化后数值就不可再改变；如果是引用类型的变量，则初始化后不能再让他指向另一个对象，即引用不可变；
 - 方法：使得继承类无法对其进行修改，类中所有的 private 方法都隐式地指定为私有方法；
@@ -108,6 +108,7 @@ Java 中实现多态有两种方式：
 
 - 当被比较的类没有重写`equals()`方法时，该方法相当于用`==`比较两个对象；
 - 当被比较的类覆盖了`equals()`方法时，一般是将其重写为比较被比较类型的值，相等即返回`true`。
+- 在本质是散列表的类（HashMap, HashTable, HashSet）中，重写`equals()`需要同时重写`hashCode()`，不然散列值不同时，无论如何两个类也不会相同。
 
 ## 4. I/O
 
@@ -231,4 +232,10 @@ threshold = size * loadFactor
 <img src="https://img-blog.csdnimg.cn/20181105181728652.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dvc2hpbWF4aWFvMQ==,size_16,color_FFFFFF,t_70" alt="hashmap流程图" style="zoom:50%;" />
 
 图中有一处错误：链表长度不是大于 8 转红黑树，而是大于等于 7 时转红黑树。
+
+### 5.2 ArrayList
+
+扩容机制：简而言之就是不足时将容量扩充为原来的 1.5 倍
+
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/image-20210528165036452.png" alt="image-20210528165036452" style="zoom:50%;" />
 
