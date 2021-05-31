@@ -404,3 +404,68 @@ threadTwo remove after:null
 
 ### 3. synchronized
 
+会导致上下文切换，导致锁十分笨重。
+
+```java
+// 关键字在实例方法上，锁为当前实例
+public synchronized void instanceLock() {
+    // code
+}
+
+// 关键字在静态方法上，锁为当前Class对象
+public static synchronized void classLock() {
+    // code
+}
+
+// 关键字在代码块上，锁为括号里面的对象
+public void blockLock() {
+    Object o = new Object();
+    synchronized (o) {
+        // code
+    }
+}
+```
+
+synchronized 的内存语义为：
+
+- 进入 synchronized 块时：把块内要用到的变量从线程的工作内存中清除，这样在 synchronized 块内使用到该变量时就不会从线程工作内存中获取，而是从主线程中获取。
+- 离开 synchronized 块时：把块内的共享变量修改刷新到主内存。
+
+### 4. volatile
+
+```java
+public class VolatileExample {
+    int a = 0;
+    volatile boolean flag = false;
+
+    public void writer() {
+        a = 1; // step 1
+        flag = true; // step 2
+    }
+
+    public void reader() {
+        if (flag) { // step 3
+            System.out.println(a); // step 4
+        }
+    }
+}
+```
+
+在Java中，volatile关键字有特殊的内存语义。volatile主要有以下两个功能：
+
+- 保证变量的**内存可见性**，线程在写入变量时不会把值缓存在寄存器或者其他地方，而是会把值刷新会主内存。
+- 禁止volatile变量与普通变量**重排序**（JSR133提出，Java 5 开始才有这个“增强的volatile内存语义”）
+
+volatile 与锁不同的是他不保证操作的原子性，使用 volatile 的场景有：
+
+- 写入变量不依赖变量的当前值时。
+- 读写变量值时没有加锁。
+
+### 5. CAS
+
+```java
+boolean compareAndSwapLong(Object obj, long offset, long expect, long update)
+```
+
+比较对象 obj 中的偏移量为 offset 的变量的值是否与 expect 相等，相等则使用 update 值更新，然后返回 true，否则返回 true。
+
