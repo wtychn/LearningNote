@@ -469,3 +469,21 @@ boolean compareAndSwapLong(Object obj, long offset, long expect, long update)
 
 比较对象 obj 中的偏移量为 offset 的变量的值是否与 expect 相等，相等则使用 update 值更新，然后返回 true，否则返回 true。
 
+### 6. 线程池 ThreadPoolExecutor
+
+[图解 | 你管这破玩意叫线程池？](https://mp.weixin.qq.com/s?__biz=Mzk0MjE3NDE0Ng==&mid=2247491549&idx=1&sn=1d5728754e8c06a621bbdca336d85452&chksm=c2c66570f5b1ec66df623e5300084257bd943b134d34e16abaacdb58834702dbbc4599868b89&scene=21#wechat_redirect)这文章写的很好啊，大佬的解释是真的清晰。
+
+<img src="https://mmbiz.qpic.cn/mmbiz_png/GLeh42uInXTjxNaj1t0BwIBXIG4UCkqlNOR6EbX3EVhyfp7fSy80IweianoAMNR6fHWicCpU9f9iaEickMyDls6BZQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片" style="zoom: 75%;" />
+
+说明一下 ThreadPoolExecutor 的一众参数接口到底是啥意思
+
+1. **execute 方法**：启动线程池，将多线程任务添加到任务队列中；
+2. **BlockingQueue**：任务队列，线程安全的阻塞对列；
+3. **Worker 线程**：执行任务队列中任务的核心线程；
+4. **corePoolSize**：Worker 核心线程的数量；
+5. **RejectedExecutionHandler 接口**：由调用者决定实现类，以便在任务提交失败后执行 rejectedExecution 方法；
+6. **ThreadFactory 接口**：增加工作线程时不再直接 new 线程，而是调用这个由调用者传入的 ThreadFactory 实现类的 newThread 方法；
+7. **workCount**：刚初始化线程池时，不再立刻创建 corePoolSize 个工作线程，而是等待调用者不断提交任务的过程中，逐渐把工作线程 Worker 创建出来，等数量达到 corePoolSize 时就停止，把任务直接丢到队列里。workCount 用来记录已经有的 Worker 线程数量；
+8. **maximumPoolSize**：当核心线程数和队列都满了时，新提交的任务仍然可以通过创建新的工作线程（叫它**非核心线程**），直到工作线程数达到 maximumPoolSize 为止，这样就可以缓解一时的高峰期了，而用户也不用设置过大的核心线程数；
+9. **keepAliveTime**：**非核心线程**超时时间，当这么长时间没能从队列里获取任务时，就不再等了，销毁线程。
+
