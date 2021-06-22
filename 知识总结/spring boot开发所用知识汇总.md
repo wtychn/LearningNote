@@ -107,11 +107,25 @@ Spring AOP 就是**基于动态代理**的，如果要代理的对象，实现�
 
 安全框架主要用于登录、权限等操作。
 ### 5.1 Shiro
+
 在使用Shiro 之前，大家做登录，权限什么的都是五花八门，各种花里胡哨的代码，不同系统的做法很有可能千差万别。
 
 但是使用 Shiro 这个安全框架之后，大家做权限的方式都一致化了，这样的好处就是你的代码我看起来容易，我的代码你也好理解。
 
 Shiro 也比较成熟，基本上能满足大部分的权限需要。
+
+<img src="https://atts.w3cschool.cn/attachments/image/wk/shiro/2.png" alt="img" style="zoom:110%;" />
+
+- **Subject**：主体，代表了当前 “**用户**”，这个用户不一定是一个具体的人，与当前应用交互的任何东西都是 Subject，如网络爬虫，机器人等；即一个抽象概念；所有 Subject 都绑定到 SecurityManager，与 Subject 的所有交互都会委托给 SecurityManager；可以把 Subject 认为是一个门面；SecurityManager 才是实际的执行者；
+
+- **SecurityManager**：安全管理器；即所有与安全有关的操作都会与 SecurityManager 交互；且它管理着所有 Subject；可以看出它是 Shiro 的核心，它负责与后边介绍的其他组件进行交互，如果学习过 SpringMVC，你**可以把它看成 DispatcherServlet 前端控制器**；
+
+- **Realm**：域，Shiro 从 Realm 获取安全数据（如用户、角色、权限），就是说 SecurityManager 要验证用户身份，那么它需要从 Realm 获取相应的用户进行比较以确定用户身份是否合法；也需要从 Realm 得到用户相应的角色 / 权限进行验证用户是否能进行操作；**可以把 Realm 看成 DataSource**，即安全数据源。
+
+也就是说对于我们而言，最简单的一个 Shiro 应用：
+
+1. 应用代码通过 Subject 来进行认证和授权，而 Subject 又委托给 SecurityManager；
+2. 我们需要给 Shiro 的 SecurityManager 注入 Realm，从而让 SecurityManager 能得到合法的用户及其权限进行判断。
 
 ## 6. 容器化
 ### 6.1 Docker 
