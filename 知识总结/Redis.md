@@ -63,3 +63,5 @@ AOF 日志过大时对文件进行重写，将命令进行多合一。日志重�
 
 <img src="https://static001.geekbang.org/resource/image/6b/e8/6b054eb1aed0734bd81ddab9a31d0be8.jpg" alt="img" style="zoom:15%;" />
 
+### 3.2 RDB 快照
+
