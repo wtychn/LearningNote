@@ -231,8 +231,6 @@ threshold = size * loadFactor
 
 <img src="https://img-blog.csdnimg.cn/20181105181728652.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dvc2hpbWF4aWFvMQ==,size_16,color_FFFFFF,t_70" alt="hashmap流程图" style="zoom:50%;" />
 
-图中有一处错误：链表长度不是大于 8 转红黑树，而是大于等于 7 时转红黑树。
-
 ### 5.2 ArrayList
 
 扩容机制：简而言之就是不足时将容量扩充为原来的 1.5 倍
