@@ -81,16 +81,7 @@ Spring AOP 就是**基于动态代理**的，如果要代理的对象，实现�
 
 *动态代理中被代理类不需要实现抽象角色接口。
 
-### 4.3 自动装配原理
-1. 整合JavaEE、解决方案、和自动配置所涉及的都在`spring-boot-autoconfigure-2.3.3.RELEASE.jar`包下   
-2. `SpringBoot`在启动时，从类路径`/META-INF/spring.factories`下获取指定的值（以`url`形式存储）
-3. 将这些自动配置类导入容器，将所有需要导入的组件以类名的方式返回，这些组件就会被添加到容器中
-4. 容器中也会存在很多命名为`xxxAutoConfigure`的文件（`@Bean`），就是这些文件给容器中导入了这个场景所需要的所有组件
-5. 给容器中自动配置类添加组件的时候,会从`xxxproperties`类中获取某些属性。我们只需要在配置文件中指定这些属性的值即可
-
->`xxxAutoConfigurartion`: 自动配置类; 给容器中添加组件  
->`xxxProperties`: 封装配置文件中相关属性
-### 4.4 Spring MVC
+### 4.3 Spring MVC
 
 <img src="https://gitee.com/wtychn/ImageBed/raw/master/image-20210621211028527.png" alt="image-20210621211028527" style="zoom:80%;" />
 
@@ -103,9 +94,151 @@ Spring AOP 就是**基于动态代理**的，如果要代理的对象，实现�
 7. `DispaterServlet`把返回的`Model`传给`View`(视图渲染)；
 8. 把`View`返回给请求者(浏览器)。
 
+<<<<<<< HEAD
 ### 4.5 SpringBoot 启动流程
 
 <img src="https://img2018.cnblogs.com/blog/1158841/201907/1158841-20190707171658626-1389392187.png" alt="img" style="zoom:100%;" />
+=======
+### 4.4 启动流程
+
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/image-20210625153912948.png" alt="image-20210625153912948" style="zoom:100%;" />
+
+从 SpringBoot 的启动类开始分析：
+
+```java
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+
+#### 4.4.1 @SpringBootApplication
+
+该注解又用到了如下注解：
+
+```java
+@Target(ElementType.TYPE) // 注解的适用范围，其中TYPE用于描述类、接口（包括包注解类型）或enum声明
+@Retention(RetentionPolicy.RUNTIME) // 注解的生命周期，保留到class文件中（三个生命周期）
+@Documented // 表明这个注解应该被javadoc记录
+@Inherited // 子类可以继承该注解
+@SpringBootConfiguration // 继承了Configuration，表示当前是注解类
+@EnableAutoConfiguration // 开启springboot的注解功能，springboot的四大神器之一，其借助@import的帮助
+@ComponentScan(excludeFilters = { // 扫描路径设置
+@Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+public @interface SpringBootApplication {
+...
+}　
+```
+
+其中`@SpringBootConfiguration`、`@EnableAutoConfiguration`、`@ComponentScan`三个注解最为重要
+
+<img src="https://img2018.cnblogs.com/blog/1158841/201907/1158841-20190709114128801-171612088.png" alt="img" style="zoom:80%;" />
+
+##### @SpringBootConfiguration
+
+该类继承自`@Configuration`注解，其作用是扫描配置类。SpringBoot 中主要使用 Config 配置类来解决配置问题。
+
+@ComponentScan
+
+1. `@ComponentScan`的功能其实就是自动扫描并加载符合条件的组件（比如`@Component`和`@Repository`等）或者bean定义；
+2. 将这些 bean 定义加载到 **IoC** 容器中。
+
+我们可以通过 basePackages 等属性来细粒度的定制`@ComponentScan`自动扫描的范围，如果不指定，则默认Spring框架实现会从声明`@ComponentScan`所在类的 package 进行扫描。
+
+**注**：所以 SpringBoot 的启动类最好是放在 root package 下，因为默认不指定 basePackages。
+
+##### @EnableAutoConfiguration
+
+`@EnableAutoConfiguration`也是借助`@Import`的帮助，将所有符合自动配置条件的 bean 定义加载到 IoC 容器。
+
+```java
+@SuppressWarnings("deprecation")
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@AutoConfigurationPackage【重点注解】
+@Import(AutoConfigurationImportSelector.class)【重点注解】
+public @interface EnableAutoConfiguration {
+...
+}
+```
+
+###### @AutoConfigurationPackage
+
+```java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@Import(AutoConfigurationPackages.Registrar.class)
+public @interface AutoConfigurationPackage {
+}
+```
+
+通过`@Import(AutoConfigurationPackages.Registrar.class)`
+
+```java
+static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImports {
+        @Override
+        public void registerBeanDefinitions(AnnotationMetadata metadata,
+                BeanDefinitionRegistry registry) {
+            register(registry, new PackageImport(metadata).getPackageName());
+        }
+		...
+}
+```
+
+注册当前启动类的根 package；
+
+注册`org.springframework.boot.autoconfigure.AutoConfigurationPackages`的 BeanDefinition。
+
+######  @Import(AutoConfigurationImportSelector.class)（关键）
+
+`AutoConfigurationImportSelector`实现了`DeferredImportSelector`从`ImportSelector`继承的方法：`selectImports()`。
+
+1. Spring Boot 在启动时除了扫描与启动类同一包下的组件之外，还会检查各个 jar 包中是否存在 `META-INF/spring.factories` 文件，为自动装配做准备。
+2. 第三方的 `spring-boot-starter` 会通过将自己的自动装配类写到 `META-INF/spring.factories` 中让 Spring Boot 加载到容器中，使自动装配类能够生效。
+3. 第三方的自动装配类会通过利用 `@Conditional` 系列注释保证自己能在各种环境中成功自动装配。
+
+```java
+@Override
+public String[] selectImports(AnnotationMetadata annotationMetadata) {
+    if (!isEnabled(annotationMetadata)) {
+    	return NO_IMPORTS;
+    }
+    AutoConfigurationMetadata autoConfigurationMetadata = AutoConfigurationMetadataLoader
+    			.loadMetadata(this.beanClassLoader);
+    AnnotationAttributes attributes = getAttributes(annotationMetadata);
+    // 从 jar 包下的 /META-INF/spring.factories 路径获取自动配置类列表
+    List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
+    configurations = removeDuplicates(configurations);
+    Set<String> exclusions = getExclusions(annotationMetadata, attributes);
+    checkExcludedClasses(configurations, exclusions);
+    configurations.removeAll(exclusions);
+    configurations = filter(configurations, autoConfigurationMetadata);
+    fireAutoConfigurationImportEvents(configurations, exclusions);
+    return StringUtils.toStringArray(configurations);
+}
+```
+
+##### 自动装配原理
+
+1. 整合JavaEE、解决方案、和自动配置所涉及的都在`spring-boot-autoconfigure-2.3.3.RELEASE.jar`包下；
+2. `SpringBoot`在启动时，从类路径`/META-INF/spring.factories`下获取指定的类信息，JVM 就可以通过类加载器加载这些类；
+3. 这样容器中就会导入很多命名为`xxxAutoConfigure`的类（`@Bean`），就是这些类给容器中导入了这个场景所需要的所有组件；
+4. 给容器中自动配置类添加组件的时候，会从`xxxproperties`类中获取某些属性。我们只需要在配置文件中指定这些属性的值即可。
+
+<img src="https://img2018.cnblogs.com/blog/1158841/201907/1158841-20190708145522504-1677532764.png" alt="img" style="zoom:100%;" />
+
+>`xxxAutoConfigurartion`: 自动配置类; 给容器中添加组件  
+>`xxxProperties`: 封装配置文件中相关属性
+
+#### 4.4.2 
+>>>>>>> 67cb9d85e4211051870fb912685d6ec206678bca
 
 ## 5. 安全框架
 
