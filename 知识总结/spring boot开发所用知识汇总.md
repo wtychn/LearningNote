@@ -103,6 +103,10 @@ Spring AOP 就是**基于动态代理**的，如果要代理的对象，实现�
 7. `DispaterServlet`把返回的`Model`传给`View`(视图渲染)；
 8. 把`View`返回给请求者(浏览器)。
 
+### 4.5 SpringBoot 启动流程
+
+<img src="https://img2018.cnblogs.com/blog/1158841/201907/1158841-20190707171658626-1389392187.png" alt="img" style="zoom:100%;" />
+
 ## 5. 安全框架
 
 安全框架主要用于登录、权限等操作。
