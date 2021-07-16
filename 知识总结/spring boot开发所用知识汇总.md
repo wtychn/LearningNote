@@ -94,6 +94,11 @@ Spring AOP 就是**基于动态代理**的，如果要代理的对象，实现�
 7. `DispaterServlet`把返回的`Model`传给`View`(视图渲染)；
 8. 把`View`返回给请求者(浏览器)。
 
+<<<<<<< HEAD
+### 4.5 SpringBoot 启动流程
+
+<img src="https://img2018.cnblogs.com/blog/1158841/201907/1158841-20190707171658626-1389392187.png" alt="img" style="zoom:100%;" />
+=======
 ### 4.4 启动流程
 
 <img src="https://gitee.com/wtychn/ImageBed/raw/master/image-20210625153912948.png" alt="image-20210625153912948" style="zoom:100%;" />
@@ -233,6 +238,7 @@ public String[] selectImports(AnnotationMetadata annotationMetadata) {
 >`xxxProperties`: 封装配置文件中相关属性
 
 #### 4.4.2 
+>>>>>>> 67cb9d85e4211051870fb912685d6ec206678bca
 
 ## 5. 安全框架
 
