@@ -1,4 +1,14 @@
 # JVM 知识总结
+---
+layout: post
+title: "JVM 牛逼！"
+date: 2021-05-30 19:50
+comments: true
+tags: 
+	- JVM
+	- 知识总结
+
+---
 
 ## 1. Java 内存区域（运行时数据区）
 

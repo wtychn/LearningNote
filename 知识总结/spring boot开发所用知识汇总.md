@@ -1,4 +1,14 @@
 # Spring Boot开发所用知识汇总
+---
+layout: post
+title: "SpringBoot 的各种乱七八糟"
+date: 2021-05-28 11:37
+comments: true
+tags: 
+	- SpringBoot
+	- 知识总结
+
+---
 Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行实际项目练手时，写篇文章总结一下近期的一些学习心得，也作为一个备忘录能够及时回顾。
 ## 1. web服务原理
 ### 1.1 Servlet原理
@@ -227,7 +237,7 @@ public String[] selectImports(AnnotationMetadata annotationMetadata) {
 
 ##### 自动装配原理
 
-1. 整合JavaEE、解决方案、和自动配置所涉及的都在`spring-boot-autoconfigure-2.3.3.RELEASE.jar`包下；
+1. 整合JavaEE、解决方案、和自动配置所涉及的都在`spring-boot-autoconfigure-2.x.x.RELEASE.jar`包下；
 2. `SpringBoot`在启动时，从类路径`/META-INF/spring.factories`下获取指定的类信息，JVM 就可以通过类加载器加载这些类；
 3. 这样容器中就会导入很多命名为`xxxAutoConfigure`的类（`@Bean`），就是这些类给容器中导入了这个场景所需要的所有组件；
 4. 给容器中自动配置类添加组件的时候，会从`xxxproperties`类中获取某些属性。我们只需要在配置文件中指定这些属性的值即可。
@@ -236,9 +246,6 @@ public String[] selectImports(AnnotationMetadata annotationMetadata) {
 
 >`xxxAutoConfigurartion`: 自动配置类; 给容器中添加组件  
 >`xxxProperties`: 封装配置文件中相关属性
-
-#### 4.4.2 
->>>>>>> 67cb9d85e4211051870fb912685d6ec206678bca
 
 ## 5. 安全框架
 
