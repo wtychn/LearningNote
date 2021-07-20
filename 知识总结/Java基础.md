@@ -1,5 +1,16 @@
 # Java 基础知识学习笔记
 
+---
+layout: post
+title: "Java 基础知识点"
+date: 2020-12-29 22:10
+comments: true
+tags: 
+	- Java
+	- 知识总结
+
+---
+
 可能不全，但是是个人感觉比较重要的 Java 基础知识。
 
 ## 1. 面向对象三大特性
@@ -229,11 +240,48 @@ threshold = size * loadFactor
 
 优化为：当重新计算出的下标未超出旧容量的链表，即`hash & oldCap == 0`的部分不做处理；超出的部分：新下标 = 原下标 + 旧容量
 
+##### 3）红黑树退化为链表
+
+有两个地方会判断并退化成链表的条件
+
+1. remove时退化
+
+```java
+// 在 removeTreeNode的方法中
+// 在红黑树的root节点为空 或者root的右节点、root的左节点、root左节点的左节点为空时 说明树都比较小了
+if (root == null || (movable && (root.right == null || (rl = root.left) == null || rl.left == null))) {
+  	tab[index] = first.untreeify(map);  // too small
+    return;
+}
+```
+
+2. 在扩容时 low、high 两个 TreeNode 长度小于 6 时 会退化为链表。
+
 <img src="https://img-blog.csdnimg.cn/20181105181728652.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dvc2hpbWF4aWFvMQ==,size_16,color_FFFFFF,t_70" alt="hashmap流程图" style="zoom:50%;" />
 
-### 5.2 ArrayList
+### 5.2 ConcurrentHashMap
+
+#### 5.2.1 java 8 之前
+
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/image-20210717223906105.png" alt="image-20210717223906105" style="zoom:40%;" />
+
+由 Segment 数组、HashEntry 组成，和 HashMap 一样，仍然是数组加链表。
+
+采用了分段锁技术，其中 Segment 继承于 ReentrantLock。不会像 HashTable 那样不管是 put 还是 get 操作都需要做同步处理，理论上 ConcurrentHashMap 支持 CurrencyLevel (Segment 数组数量)的线程并发。每当一个线程占用锁访问一个 Segment 时，不会影响到其他的 Segment。
+
+由于 HashEntry 中的 value 属性是用 volatile 关键词修饰的，保证了内存可见性，所以每次获取时都是最新值。
+
+#### 5.2.2 java 8 之后
+
+<img src="https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_png/QCu849YTaIPf1sDCN5zcDdGsibZwyzy9r6hAjXjUBUbenB9FQ9BKXGQaQ0M64Q7HP9fTYSKBWkrrZfmsibdEcKDg/640?wx_fmt=png" alt="640?wx_fmt=png" style="zoom:90%;" />
+
+抛弃了原有的 Segment 分段锁，而采用了 `CAS + synchronized` 来保证并发安全性。
+
+将之前存放数据的 HashEntry 改为 Node.
+
+### 5.3 ArrayList
 
 扩容机制：简而言之就是不足时将容量扩充为原来的 1.5 倍
 
-<img src="https://gitee.com/wtychn/ImageBed/raw/master/image-20210528165036452.png" alt="image-20210528165036452" style="zoom:50%;" />
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/image-20210528165036452.png" alt="image-20210528165036452" style="zoom:80%;" />
 

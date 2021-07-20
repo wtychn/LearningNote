@@ -1,5 +1,16 @@
 # ElasticSearch
 
+---
+layout: post
+title: "ElasticSearch 入门"
+date: 2021-07-05 16:36
+comments: true
+tags: 
+	- 中间件
+	- 知识总结
+
+---
+
 ## 1. 名词解释
 
 ### 1.1 接近实时（NRT） 
