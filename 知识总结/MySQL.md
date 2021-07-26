@@ -150,14 +150,13 @@ MySQL 使用B+树作为存储的数据结构，B-树是一种多路自平衡搜�
 
 ### 2. 事务的实现原理
 
-mysql 每执行一条语句记录一条日志:
+mysql 每条记录在更新的时候都会同时记录一条回滚操作，记录上的最新值，通过回滚操作，都可以得到前一个状态的值。
 
-1. start transaction，先记个日志，真正执行执行。
-2. `UPDATE user set balance = balance - 200 where id = 1`，先记个日志，真正执行。
-   如果此时断电了，当然不能继续执行了，过了一会来电了，启动 mysql 会检查日志，发现有个事
-   务没有执行完毕，没有`commit`，就会安装反向的操作把他回滚了。
-3. `UPDATE user set balance = balance + 200 where id = 2`，先记个日志，真正执行。
-4. 如`commit`，记个记录，执行，结束了，日志就能删除了。如果`rollback`，就会按照日志反向操作，回滚。
+<img src="https://static001.geekbang.org/resource/image/d9/ee/d9c313809e5ac148fc39feff532f0fee.png" alt="img" style="zoom:50%;" />
+
+在查询这条记录的时候，不同时刻启动的事务会有不同的 read-view。如图中看到的，在视图 A、B、C 里面，这一个记录的值分别是 1、2、4，同一条记录在系统中可以存在多个版本，就是数据库的多版本并发控制（MVCC）。对于 read-view A，要得到 1，就必须将当前值依次执行图中所有的回滚操作得到。
+
+当系统里没有比这个回滚日志更早的 read-view 的时候，回滚日志会被删除。
 
 ### 3. 隔离性
 
