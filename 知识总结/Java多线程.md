@@ -495,6 +495,8 @@ boolean compareAndSwapLong(Object obj, long offset, long expect, long update)
 
 <img src="https://mmbiz.qpic.cn/mmbiz_png/GLeh42uInXTjxNaj1t0BwIBXIG4UCkqlNOR6EbX3EVhyfp7fSy80IweianoAMNR6fHWicCpU9f9iaEickMyDls6BZQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片" style="zoom: 75%;" />
 
+#### 6.1 参数含义
+
 说明一下 ThreadPoolExecutor 的一众参数接口到底是啥意思
 
 1. **execute 方法**：启动线程池，将多线程任务添加到任务队列中；
@@ -507,3 +509,61 @@ boolean compareAndSwapLong(Object obj, long offset, long expect, long update)
 8. **maximumPoolSize**：当核心线程数和队列都满了时，新提交的任务仍然可以通过创建新的工作线程（叫它**非核心线程**），直到工作线程数达到 maximumPoolSize 为止，这样就可以缓解一时的高峰期了，而用户也不用设置过大的核心线程数；
 9. **keepAliveTime**：**非核心线程**超时时间，当这么长时间没能从队列里获取任务时，就不再等了，销毁线程。
 
+#### 6.2 参数配置估计
+
+##### 6.2.1 默认值
+
+- corePoolSize = 1
+- queueCapacity = Integer.MAX_VALUE
+- maxPoolSize = Integer.MAX_VALUE
+- keepAliveTime = 60s
+- allowCoreThreadTimeout = false
+- rejectedExecutionHandler = AbortPolicy()
+
+##### 6.2.2 如何来设置
+
+需要根据几个值来决定：
+
+- tasks：每秒的任务数，假设为 500~1000
+- taskcost：每个任务花费时间，假设为0.1s
+- responsetime：系统允许容忍的最大响应时间，假设为1s
+
+做几个计算：
+
+**corePoolSize = 每秒需要多少个线程处理？**
+
+- threadcount = 50~100 个线程。corePoolSize设置应该大于50
+
+  ```
+    threadcount 
+  = tasks / (1 / taskcost) 
+  = tasks * taskcost 
+  = (500~1000) * 0.1 
+  = 50~100
+  ```
+
+- 根据8020原则，如果80%的每秒任务数小于800，那么corePoolSize设置为80即可
+
+**queueCapacity = 等待 responsetime 内的任务量**
+
+```
+queueCapacity = (coreSizePool / taskcost) * responsetime
+```
+
+- 计算可得 queueCapacity = 80 / 0.1 * 1 = 80。意思是队列里的线程可以等待1s，超过了的需要新开线程来执行
+- 切记不能设置为 Integer.MAX_VALUE，这样队列会很大，线程数只会保持在 corePoolSize 大小，当任务陡增时，不能新开线程来执行，响应时间会随之陡增。
+
+**maxPoolSize = （最大任务数 - 队列容量）/ 每个线程每秒处理能力**
+
+```
+maxPoolSize = (max(tasks) - queueCapacity) / (1 / taskcost)
+```
+
+- 计算可得 maxPoolSize = (1000 - 80) / 10 = 92
+- （最大任务数 - 队列容量）/ 每个线程每秒处理能力 = 最大线程数
+
+rejectedExecutionHandler：根据具体情况来决定，任务不重要可丢弃，任务重要则要利用一些缓冲机制来处理
+
+keepAliveTime 和 allowCoreThreadTimeout 采用默认通常能满足
+
+以上都是理想值，实际情况下要根据机器性能来决定。如果在未达到最大线程数的情况机器 cpu load 已经满了，则需要通过升级硬件和优化代码，降低 taskcost 来处理。
