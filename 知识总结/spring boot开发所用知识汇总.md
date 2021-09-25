@@ -13,7 +13,7 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 ## 1. web服务原理
 ### 1.1 Servlet原理
 图片源自[狂神的JavaWeb入门到实战](https://www.bilibili.com/video/BV12J411M7Sj?p=9)
-<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165223.png" alt="servelet" style="zoom:50%;" />
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165223.png" alt="servelet" style="zoom: 67%;" />
 
 ### 1.2 MVC架构
 <img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200904160121.png" alt="MVC" style="zoom:50%;" />
@@ -43,7 +43,7 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 
 ## 3. 服务器
 通常来讲，只要运行在服务器系统之上，绑定了服务器IP地址并且在某一个端口监听用户请求并提供服务的软件都可以叫服务器软件，其更像是一个容器的概念，包含了请求所需的资源容器。
-<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165636.png" alt="web服务原理" style="zoom: 50%;" />
+<img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200803165636.png" alt="web服务原理" style="zoom: 70%;" />
 图片源自[狂神的JavaWeb入门到实战](https://www.bilibili.com/video/BV12J411M7Sj?p=9)
 
 目前能使用到的Web服务器就是`Nginx`和`Tomcat`，接下来就这两个软件分开说一下。
@@ -69,188 +69,10 @@ Spring Boot开发所需知识繁琐复杂，知识学的差不多在想要进行
 3. 那么此时`tomcat_8222`就会从`Redis`去获取相关信息，一看有对应信息，那么就会呈现登陆状态。
 <img src="https://gitee.com/wtychn/ImageBed/raw/master/img/6660.png" alt="session共享" style="zoom:50%;" />
 
-## 4. SpringBoot
-
-### 4.1 IOC
-
-IOC(Inversion of Control)，控制反转的核心思想在于，**资源（bean）的使用不由使用各自管理，而是交给不使用资源的第三方进行管理（容器）**。这样的好处是资源是集中管理的，可配置、易维护，同时也降低了双方的依赖度做到了低耦合。
-
-### 4.2 AOP
-
-AOP（Aspect-Oriented Programming：面向切面编程）能够将那些与业务无关，却为业务模块所共同调用的逻辑或责任（例如事务处理、日志管理、权限控制等）封装起来，便于減少系统的重复代码，降低模块间的耦合度，并有利于未来的可拓展性和可维护性。
-
-Spring AOP 就是**基于动态代理**的，如果要代理的对象，实现了某个接口，那么 Spring AOP 会使用 JDK Proxy，去创建代理对象，而对于没有实现接口的对象，就无法使用 JDK Proxy 去进行代理了，这时候 Spring AOP 会使用Cgib，这时候 Spring AOP 会使用 Cgib 生成一个被代理对象的子类来作为代理。
-
-#### 说一说代理模式
-
-|                          | 接口实现     | InvocationHandler | CGLIB             |
-| ------------------------ | ------------ | ----------------- | ----------------- |
-| 种类                     | 静态代理     | 动态代理          | 动态代理          |
-| 被代理类是否需要实现接口 | 是           | 是                | 否                |
-| 代理类实现接口           | 抽象角色接口 | InvocationHandler | MethodInterceptor |
-
-*动态代理中被代理类不需要实现抽象角色接口。
-
-### 4.3 Spring MVC
-
-<img src="https://gitee.com/wtychn/ImageBed/raw/master/image-20210621211028527.png" alt="image-20210621211028527" style="zoom:80%;" />
-
-1. 客户端(浏览器)发送请求，直接请求到`DispatcherServlet`；
-2. `DispatcherServlet`根据请求信息调用`HandlerMapping`，解析请求对应的`Handler`；
-3. 解析到对应的`Handler`(也就是我们平常说的`Controller`控制器)后，开始由`HandlerAdapter`适配器处理；
-4. `HandlerAdapter`会根据`Handler`来调用真正的处理器开处理请求,并处理相应的业务逻辑；
-5. 处理器处理完业务后，会返回`ModelAndView`对象，`Model`是返回的数据对象，`View`是个逻辑上的 view；
-6. `ViewResolver`会根据逻辑`View`查找实际的`View`；
-7. `DispaterServlet`把返回的`Model`传给`View`(视图渲染)；
-8. 把`View`返回给请求者(浏览器)。
-
-<<<<<<< HEAD
-### 4.5 SpringBoot 启动流程
-
-<img src="https://img2018.cnblogs.com/blog/1158841/201907/1158841-20190707171658626-1389392187.png" alt="img" style="zoom:100%;" />
-=======
-### 4.4 启动流程
-
-<img src="https://gitee.com/wtychn/ImageBed/raw/master/image-20210625153912948.png" alt="image-20210625153912948" style="zoom:100%;" />
-
-从 SpringBoot 的启动类开始分析：
-
-```java
-@SpringBootApplication
-public class Application {
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-}
-```
-
-#### 4.4.1 @SpringBootApplication
-
-该注解又用到了如下注解：
-
-```java
-@Target(ElementType.TYPE) // 注解的适用范围，其中TYPE用于描述类、接口（包括包注解类型）或enum声明
-@Retention(RetentionPolicy.RUNTIME) // 注解的生命周期，保留到class文件中（三个生命周期）
-@Documented // 表明这个注解应该被javadoc记录
-@Inherited // 子类可以继承该注解
-@SpringBootConfiguration // 继承了Configuration，表示当前是注解类
-@EnableAutoConfiguration // 开启springboot的注解功能，springboot的四大神器之一，其借助@import的帮助
-@ComponentScan(excludeFilters = { // 扫描路径设置
-@Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
-@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
-public @interface SpringBootApplication {
-...
-}　
-```
-
-其中`@SpringBootConfiguration`、`@EnableAutoConfiguration`、`@ComponentScan`三个注解最为重要
-
-<img src="https://img2018.cnblogs.com/blog/1158841/201907/1158841-20190709114128801-171612088.png" alt="img" style="zoom:80%;" />
-
-##### @SpringBootConfiguration
-
-该类继承自`@Configuration`注解，其作用是扫描配置类。SpringBoot 中主要使用 Config 配置类来解决配置问题。
-
-@ComponentScan
-
-1. `@ComponentScan`的功能其实就是自动扫描并加载符合条件的组件（比如`@Component`和`@Repository`等）或者bean定义；
-2. 将这些 bean 定义加载到 **IoC** 容器中。
-
-我们可以通过 basePackages 等属性来细粒度的定制`@ComponentScan`自动扫描的范围，如果不指定，则默认Spring框架实现会从声明`@ComponentScan`所在类的 package 进行扫描。
-
-**注**：所以 SpringBoot 的启动类最好是放在 root package 下，因为默认不指定 basePackages。
-
-##### @EnableAutoConfiguration
-
-`@EnableAutoConfiguration`也是借助`@Import`的帮助，将所有符合自动配置条件的 bean 定义加载到 IoC 容器。
-
-```java
-@SuppressWarnings("deprecation")
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Inherited
-@AutoConfigurationPackage【重点注解】
-@Import(AutoConfigurationImportSelector.class)【重点注解】
-public @interface EnableAutoConfiguration {
-...
-}
-```
-
-###### @AutoConfigurationPackage
-
-```java
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Inherited
-@Import(AutoConfigurationPackages.Registrar.class)
-public @interface AutoConfigurationPackage {
-}
-```
-
-通过`@Import(AutoConfigurationPackages.Registrar.class)`
-
-```java
-static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImports {
-        @Override
-        public void registerBeanDefinitions(AnnotationMetadata metadata,
-                BeanDefinitionRegistry registry) {
-            register(registry, new PackageImport(metadata).getPackageName());
-        }
-		...
-}
-```
-
-注册当前启动类的根 package；
-
-注册`org.springframework.boot.autoconfigure.AutoConfigurationPackages`的 BeanDefinition。
-
-######  @Import(AutoConfigurationImportSelector.class)（关键）
-
-`AutoConfigurationImportSelector`实现了`DeferredImportSelector`从`ImportSelector`继承的方法：`selectImports()`。
-
-1. Spring Boot 在启动时除了扫描与启动类同一包下的组件之外，还会检查各个 jar 包中是否存在 `META-INF/spring.factories` 文件，为自动装配做准备。
-2. 第三方的 `spring-boot-starter` 会通过将自己的自动装配类写到 `META-INF/spring.factories` 中让 Spring Boot 加载到容器中，使自动装配类能够生效。
-3. 第三方的自动装配类会通过利用 `@Conditional` 系列注释保证自己能在各种环境中成功自动装配。
-
-```java
-@Override
-public String[] selectImports(AnnotationMetadata annotationMetadata) {
-    if (!isEnabled(annotationMetadata)) {
-    	return NO_IMPORTS;
-    }
-    AutoConfigurationMetadata autoConfigurationMetadata = AutoConfigurationMetadataLoader
-    			.loadMetadata(this.beanClassLoader);
-    AnnotationAttributes attributes = getAttributes(annotationMetadata);
-    // 从 jar 包下的 /META-INF/spring.factories 路径获取自动配置类列表
-    List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
-    configurations = removeDuplicates(configurations);
-    Set<String> exclusions = getExclusions(annotationMetadata, attributes);
-    checkExcludedClasses(configurations, exclusions);
-    configurations.removeAll(exclusions);
-    configurations = filter(configurations, autoConfigurationMetadata);
-    fireAutoConfigurationImportEvents(configurations, exclusions);
-    return StringUtils.toStringArray(configurations);
-}
-```
-
-##### 自动装配原理
-
-1. 整合JavaEE、解决方案、和自动配置所涉及的都在`spring-boot-autoconfigure-2.x.x.RELEASE.jar`包下；
-2. `SpringBoot`在启动时，从类路径`/META-INF/spring.factories`下获取指定的类信息，JVM 就可以通过类加载器加载这些类；
-3. 这样容器中就会导入很多命名为`xxxAutoConfigure`的类（`@Bean`），就是这些类给容器中导入了这个场景所需要的所有组件；
-4. 给容器中自动配置类添加组件的时候，会从`xxxproperties`类中获取某些属性。我们只需要在配置文件中指定这些属性的值即可。
-
-<img src="https://img2018.cnblogs.com/blog/1158841/201907/1158841-20190708145522504-1677532764.png" alt="img" style="zoom:100%;" />
-
->`xxxAutoConfigurartion`: 自动配置类; 给容器中添加组件  
->`xxxProperties`: 封装配置文件中相关属性
-
-## 5. 安全框架
+## 4. 安全框架
 
 安全框架主要用于登录、权限等操作。
-### 5.1 Shiro
+### 4.1 Shiro
 
 在使用Shiro 之前，大家做登录，权限什么的都是五花八门，各种花里胡哨的代码，不同系统的做法很有可能千差万别。
 
@@ -271,13 +93,19 @@ Shiro 也比较成熟，基本上能满足大部分的权限需要。
 1. 应用代码通过 Subject 来进行认证和授权，而 Subject 又委托给 SecurityManager；
 2. 我们需要给 Shiro 的 SecurityManager 注入 Realm，从而让 SecurityManager 能得到合法的用户及其权限进行判断。
 
-## 6. 容器化
-### 6.1 Docker 
+## 5. 容器化
+### 5.1 Docker 
 常用基础命令
 <img src="https://gitee.com/wtychn/ImageBed/raw/master/img/20200929100309.png" alt="docker命令" style="zoom:50%;" />
 
->引用文章：
-- [服务器软件大盘点！ - CodeSheep - 掘金专栏](https://juejin.im/post/5e8409f9f265da47f144a07a#heading-12)
-- [how2j教程](https://how2j.cn/)
-- [狂神说Java](https://space.bilibili.com/95256449/channel/detail?cid=146244)
+## 7. Restful 风格架构
+
+1. 每一个URI代表一种资源；
+2. 客户端和服务器之间，传递这种资源的某种表现层；
+3. 客户端通过四个HTTP动词，对服务器端资源进行操作，实现"表现层状态转化"。
+
+注意：
+
+- URI 中不包含动词，动词通过 HTTP 方法表达；
+- 不同的版本，可以理解成同一种资源的不同表现形式，所以应该采用同一个 URI。版本号可以在 HTTP 请求头信息的 Accept 字段中进行区分。
 

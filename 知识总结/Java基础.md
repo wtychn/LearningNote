@@ -39,7 +39,24 @@ tags:
 #### *重写与重载的区别：
 
 - 方法重写：相对继承而言，子类中对父类已经存在的方法进行区别化的修改。
+  - 参数列表与被重写方法的参数列表必须完全相同。
+  - 返回类型与被重写方法的返回类型可以不相同，但是必须是父类返回值的派生类（java5 及更早版本返回类型要一样，java7 及更高版本可以不同）。
+  - 访问权限不能比父类中被重写的方法的访问权限更低。例如：如果父类的一个方法被声明为 public，那么在子类中重写该方法就不能声明为 protected。
+  - 父类的成员方法只能被它的子类重写。
+  - 声明为 final 的方法不能被重写。
+  - 声明为 static 的方法不能被重写，但是能够被再次声明。
+  - 子类和父类在同一个包中，那么子类可以重写父类所有方法，除了声明为 private 和 final 的方法。
+  - 子类和父类不在同一个包中，那么子类只能够重写父类的声明为 public 和 protected 的非 final 方法。
+  - 重写的方法能够抛出任何非强制异常，无论被重写的方法是否抛出异常。但是，重写的方法不能抛出新的强制性异常，或者比被重写方法声明的更广泛的强制性异常，反之则可以。
+  - 构造方法不能被重写。
+  - 如果不能继承一个类，则不能重写该类的方法。
 - 方法重载：在同一个类中处理不同数据的多个相同方法名的多态手段。
+  - 被重载的方法必须改变参数列表(参数个数或类型不一样)；
+  - 被重载的方法可以改变返回类型；
+  - 被重载的方法可以改变访问修饰符；
+  - 被重载的方法可以声明新的或更广的检查异常；
+  - 方法能够在同一个类中或者在一个子类中被重载。
+  - 无法以返回值类型作为重载函数的区分标准。
 
 ### 1.3 多态
 
@@ -106,7 +123,7 @@ Java 中实现多态有两种方式：
 可以用于修饰变量、方法和类，分别表示**变量不可变、方法不可覆盖、类不可被继承**：
 
 - 变量：如果是基本数据类型，则初始化后数值就不可再改变；如果是引用类型的变量，则初始化后不能再让他指向另一个对象，即引用不可变；
-- 方法：使得继承类无法对其进行修改，类中所有的 private 方法都隐式地指定为私有方法；
+- 方法：使得继承类无法对其进行修改，类中所有的 private 方法都隐式地指定为 final 方法；
 - 类：使得类无法被继承，final 类中所有的成员方法都被隐式地指定为 final 方法。
 
 ## 3. == 与 equals
@@ -284,4 +301,104 @@ if (root == null || (movable && (root.right == null || (rl = root.left) == null 
 扩容机制：简而言之就是不足时将容量扩充为原来的 1.5 倍
 
 <img src="https://gitee.com/wtychn/ImageBed/raw/master/image-20210528165036452.png" alt="image-20210528165036452" style="zoom:80%;" />
+
+## 6. Java 8 新特性
+
+### 6.1 Lambda 表达式
+
+Lambda 允许把函数作为一个方法的参数（函数作为参数传递进方法中）。
+
+lambda 表达式的语法格式如下：
+
+``` java
+(parameters) -> expression or (parameters) ->{statements; }
+```
+
+### 6.2 方法引用
+
+方法引用通过方法的名字来指向一个方法。方法引用可以使语言的构造更紧凑简洁，减少冗余代码。方法引用使用一对冒号 :: 。
+
+```java
+public class Java8Tester {
+    public static void main(String args[]) {
+        List names = new ArrayList();
+        names.add("Google");
+        names.add("Runoob");
+        names.add("Taobao");
+        names.forEach(System.out::println);
+    }
+}
+```
+
+### 6.3 函数式接口
+
+函数式接口 (Functional Interface) 就是一个有且仅有一个抽象方法，但是可以有多个非抽象方法的接口。函数式接口可以被隐式转换为lambda表达式。函数式接口可以现有的函数友好地支持 lambda。
+
+- **java.lang.Runnable**
+- **java.util.concurrent.Callable**
+- java.security.PrivilegedAction
+- **java.util.Comparator**
+- java.io.FileFilter
+- java.nio.file.PathMatcher
+- java.lang.reflect.InvocationHandler
+- java.beans.PropertyChangeListener
+- java.awt.event.ActionListener
+- javax.swing.event.ChangeListener
+- java.util.function (Java 8 新增)
+
+### 6.4  默认方法
+
+Java 8 新增了接口的默认方法。简单说，默认方法就是接口可以有实现方法，而且不需要实现类去实现其方法。我们只需在方法名前面加个 default 关键字即可实现默认方法。
+
+```java
+public interface vehicle {
+    default void print() {
+        System.out.println("我是一辆车!");
+    }
+}
+```
+
+### 6.5 流式编程
+
+在Java 8中,集合接口有两个方法来生成流：
+
+- stream() −为集合创建串行流
+- parallelStream() − 为集合创建并行流
+
+常用方法：
+
+- forEach
+- map
+- filter
+- limit
+- sorted
+- Collectors
+
+### 6.6 Optional 实例
+
+```java
+public class Java8Tester {
+    public static void main(String args[]) {
+        Java8Tester java8Tester = new Java8Tester();
+        Integer value1 = null;
+        Integer value2 = new Integer(10);
+        // Optional.ofNullable - 允许传递为 null 参数
+        Optional<Integer> a = Optional.ofNullable(value1);
+        // Optional.of - 如果传递的参数是 null，抛出异常 NullPointerException
+        Optional<Integer> b = Optional.of(value2);
+        System.out.println(java8Tester.sum(a, b));
+    }
+ 
+    public Integer sum(Optional<Integer> a, Optional<Integer> b) {
+        // Optional.isPresent - 判断值是否存在
+        System.out.println("第一个参数值存在: " + a.isPresent());
+        System.out.println("第二个参数值存在: " + b.isPresent());
+        // Optional.orElse - 如果值存在，返回它，否则返回默认值
+        Integer value1 = a.orElse(new Integer(0));
+        //Optional.get - 获取值，值需要存在
+        Integer value2 = b.get();
+        return value1 + value2;
+    }
+}
+```
 

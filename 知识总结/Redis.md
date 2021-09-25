@@ -18,6 +18,106 @@ tags:
 
 Redis 的键值对采用**哈希表**的形式存储。
 
+Redis 有五种数据类型 String, Hash, List, Set, zset
+
+<img src="https://img2018.cnblogs.com/blog/1289934/201906/1289934-20190621163930814-1395015700.png" alt="img" style="zoom: 70%;" />
+
+### 1.1 String
+
+```shell
+redis 127.0.0.1:6379> SET runoob "菜鸟教程"
+OK
+redis 127.0.0.1:6379> GET runoob
+"菜鸟教程"
+```
+
+**应用场景**：
+
+1. 访问量统计：每次访问博客和文章使用 INCR 命令进行递增。
+2. 一般做一些复杂的技术功能的缓存。
+
+### 1.2 Hash
+
+```shell
+redis 127.0.0.1:6379> DEL runoob
+redis 127.0.0.1:6379> HMSET runoob field1 "Hello" field2 "World"
+"OK"
+redis 127.0.0.1:6379> HGET runoob field1
+"Hello"
+redis 127.0.0.1:6379> HGET runoob field2
+"World"
+```
+
+**应用场景：**
+
+存储、读取、修改对象属性，比如：用户（姓名、性别、爱好），文章（标题、发布时间、作者、内容）
+
+### 1.3 List
+
+```shell
+redis 127.0.0.1:6379> DEL runoob
+redis 127.0.0.1:6379> lpush runoob redis
+(integer) 1
+redis 127.0.0.1:6379> lpush runoob mongodb
+(integer) 2
+redis 127.0.0.1:6379> lpush runoob rabbitmq
+(integer) 3
+redis 127.0.0.1:6379> lrange runoob 0 10
+1) "rabbitmq"
+2) "mongodb"
+3) "redis"
+```
+
+**应用场景：**
+
+做简单的消息队列的功能；最新消息排行等功能（比如朋友圈的时间线）。
+
+### 1.4 Set
+
+```shell
+redis 127.0.0.1:6379> DEL runoob
+redis 127.0.0.1:6379> sadd runoob redis
+(integer) 1
+redis 127.0.0.1:6379> sadd runoob mongodb
+(integer) 1
+redis 127.0.0.1:6379> sadd runoob rabbitmq
+(integer) 1
+redis 127.0.0.1:6379> sadd runoob rabbitmq
+(integer) 0
+redis 127.0.0.1:6379> smembers runoob
+1) "redis"
+2) "rabbitmq"
+3) "mongodb"
+```
+
+**应用场景：**
+
+1. 共同好友
+2. 利用唯一性，统计访问网站的所有独立ip
+3. 好友推荐时，根据tag求交集，大于某个阈值就可以推荐
+
+### 1.5 zset
+
+```shell
+redis 127.0.0.1:6379> DEL runoob
+redis 127.0.0.1:6379> zadd runoob 0 redis
+(integer) 1
+redis 127.0.0.1:6379> zadd runoob 0 mongodb
+(integer) 1
+redis 127.0.0.1:6379> zadd runoob 0 rabbitmq
+(integer) 1
+redis 127.0.0.1:6379> zadd runoob 0 rabbitmq
+(integer) 0
+redis 127.0.0.1:6379> ZRANGEBYSCORE runoob 0 1000
+1) "mongodb"
+2) "rabbitmq"
+3) "redis"
+```
+
+**应用场景**：
+
+排行榜，取TopN操作。带权重的消息队列。
+
 ## 2. 单线程模型
 
 Redis 虽然是单线程模型，但是采用了**多路复用机制**来保证其在网络 IO 操作中能够并发处理大量客户端请求，实现高吞吐率。

@@ -451,6 +451,16 @@ synchronized 的内存语义为：
 - 进入 synchronized 块时：把块内要用到的变量从线程的工作内存中清除，这样在 synchronized 块内使用到该变量时就不会从线程工作内存中获取，而是从主线程中获取。
 - 离开 synchronized 块时：把块内的共享变量修改刷新到主内存。
 
+**每个对象头中都包含一个 monitor 对象用来执行 synchronized 监视器锁**。
+
+获取锁的具体流程：
+
+- 当我们进入一个方法时，执行 **monitorenter**，就会获取当前对象的所有权，这个时候 monitor 进入数为 1，当前的这个线程就是这个 monitor 的 owner。
+- 如果你已经是这个 monitor 的 owner 了，你再次进入，就会把进入数 +1.
+- 同理，当他执行完 **monitorexit**，对应的进入数就 -1，直到为 0，才可以被其他线程持有。
+
+所有的互斥，其实在这里，就是看你能否获得 monitor 的所有权，一旦你成为 owner 就是获得者。而 monitor 的进入计数则是为了锁的可重入性，避免一些死锁的情况，也可以让我们更好封装我们的代码。
+
 ### 4. volatile
 
 ```java
@@ -567,3 +577,178 @@ rejectedExecutionHandler：根据具体情况来决定，任务不重要可丢�
 keepAliveTime 和 allowCoreThreadTimeout 采用默认通常能满足
 
 以上都是理想值，实际情况下要根据机器性能来决定。如果在未达到最大线程数的情况机器 cpu load 已经满了，则需要通过升级硬件和优化代码，降低 taskcost 来处理。
+
+### 7. 线程同步器
+
+#### 7.1 CountDownLatch 计数器
+
+```java
+private static CountDownLatch countDownLatch = new CountDownLatch(2);
+
+public static void main(String[] args) throws InterruptedException {
+
+    ExecutorService t = Executors.newCachedThreadPool();
+
+    Runnable r1 = () -> {
+        try {
+            System.out.println("r1 sleep");
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            countDownLatch.countDown();
+        }
+    };
+
+    Runnable r2 = () -> {
+        try {
+            System.out.println("r2 sleep");
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            countDownLatch.countDown();
+        }
+    };
+
+    t.submit(r1);
+    t.submit(r2);
+
+    System.out.println("main wait");
+    countDownLatch.await();
+    System.out.println("main over");
+}
+```
+
+CountDownLatch 流程：
+
+- 新建 CountDownLatch 实例，传入计数器次数
+- 主线程调用 CountDownLatch.await() 方法后会被阻塞
+- 子线程中在某处调用 CountDownLatch.countDown() 方法可使内部计数器减 1
+- 当计数器变成 0 时，主线程的 await() 方法才会返回
+
+CountDownLatch 优点：
+
+- 调用 Thread.join() 调用线程会被阻塞至子线程运行完毕，而 CountDownLatch.countDown() 可在线程运行中执行
+- 使用线程池时是提交任务的，而没有接触到线程无法使用线程方法，那么 countDown() 可加在 Runnable 中执行
+
+CountDownLatch 原理：
+
+- 继承了 AQS，其实就是用 AQS 的 state 来表示计数器
+- await() 方法内部有 acquireSharedInterruptibly()，后者调用了重写 tryaquireShared() 其实就是判断计数器是否为 0，不为 0 则阻塞进 AQS 队列
+- countDown() 方法内部有 releaseShared()，后者调用了重写 tryReleaseShared() 计数器减一，若为 0，则唤醒阻塞线程
+
+#### 7.2 CyclicBarrier 回环屏障
+
+```java
+private static CyclicBarrier cyclicBarrier = new CyclicBarrier(2, 
+                        () -> System.out.println("一个阶段完成"));
+
+public static void main(String[] args) throws InterruptedException {
+
+    ExecutorService service = Executors.newCachedThreadPool();
+
+    Runnable r1 = () -> {
+        try {
+            System.out.println(Thread.currentThread() + "Step1");
+            cyclicBarrier.await();
+
+            System.out.println(Thread.currentThread() + "Step2");
+            cyclicBarrier.await();
+
+            System.out.println(Thread.currentThread() + "Step3");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    };
+
+    Runnable r2 = () -> {
+        try {
+            System.out.println(Thread.currentThread() + "Step1");
+            cyclicBarrier.await();
+
+            System.out.println(Thread.currentThread() + "Step2");
+            cyclicBarrier.await();
+
+            System.out.println(Thread.currentThread() + "Step3");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    };
+
+    service.submit(r1);
+    service.submit(r2);
+
+    service.shutdown();
+}
+```
+
+CyclicBarrier 的流程
+
+- 和上面差不多就不一一解释了
+- CyclicBarrier 的构造方法中，第一个参数为计数器次数，第二个为阶段结束后要执行的方法
+
+CyclicBarrier 的原理
+
+- 基于独占锁，底层是 AQS 实现，独占锁可以原子性改变计数器，以及条件队列阻塞线程来实现线程同步
+- 内部有 parties 和 count 变量，实现重置功能
+- await() 方法内调用 dowait() 方法 
+  - 获取锁更新次数减一
+  - 没有为 0，阻塞当前线程加入条件队列
+  - 为 0 执行屏蔽点任务，然后唤醒条件队列的全部线程
+
+#### 7.3 Semaphore
+
+```java
+private static Semaphore semaphore = new Semaphore(0);
+
+public static void main(String[] args) throws InterruptedException {
+
+    ExecutorService service = Executors.newCachedThreadPool();
+
+    Runnable r1 = () -> {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(Thread.currentThread() + "over");
+        semaphore.release();;
+    };
+
+    Runnable r2 = () -> {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(Thread.currentThread() + "over");
+        semaphore.release();
+    };
+
+    service.submit(r1);
+    service.submit(r2);
+
+    semaphore.acquire(2);
+    System.out.println("All child thread over");
+
+    service.shutdown();
+}
+```
+
+Semaphore 的流程
+
+- Semaphore 的构造函数传参复制当前计数器的值
+- 每个线程内部调用 release() 即计数器加 1
+- 主线程调用 acquire() 方法传参为 2 ，会被阻塞至计数器到达 2
+
+Semaphore 的原理
+
+- 底层还是使用 AQS，提供了公平与非公平，也是用 state 表示次数
+- acquire() 方法获取一个信号量，并且 state 减一 
+  - 若为 0，直接返回
+  - 不为 0 当前线程会被加入 AQS 阻塞队列
+- release() 方法，把当前 Semaphore 的信号量加 1，然后会选择一个信号量满足的线程进行激活
+- 内部还实现了公平与非公平策略
+
