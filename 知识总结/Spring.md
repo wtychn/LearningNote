@@ -23,7 +23,7 @@ IOC(Inversion of Control)，控制反转的核心思想在于，**资源（bean�
 
 AOP（Aspect-Oriented Programming：面向切面编程）能够将那些与业务无关，却为业务模块所共同调用的逻辑或责任（例如事务处理、日志管理、权限控制等）封装起来，便于減少系统的重复代码，降低模块间的耦合度，并有利于未来的可拓展性和可维护性。
 
-Spring AOP 就是**基于动态代理**的，如果要代理的对象，实现了某个接口，那么 Spring AOP 会使用 JDK Proxy，去创建代理对象，而对于没有实现接口的对象，就无法使用 JDK Proxy 去进行代理了，这时候 Spring AOP 会使用Cgib，这时候 Spring AOP 会使用 Cgib 生成一个被代理对象的子类来作为代理。
+Spring AOP 就是**基于动态代理**的，如果要代理的对象，实现了某个接口，那么 Spring AOP 会使用 JDK Proxy，去创建代理对象，而对于没有实现接口的对象，就无法使用 JDK Proxy 去进行代理了，这时候 Spring AOP 会使用 Cglib，这时候 Spring AOP 会使用 Cgib 生成一个被代理对象的子类来作为代理。
 
 ### 说一说代理模式
 
@@ -192,7 +192,7 @@ public List<Teacher> getKlassRelatedTeachers(
 
 我们的数据源`application.yml`内容如下：：
 
-```
+```yaml
 wuhan2020: 2020年初武汉爆发了新型冠状病毒，疫情严重，但是，我相信一切都会过去！武汉加油！中国加油！
 
 my-profile:
@@ -208,7 +208,6 @@ library:
       description: 为什么我们记得过去，而非未来？时间“流逝”意味着什么？是我们存在于时间之内，还是时间存在于我们之中？卡洛·罗韦利用诗意的文字，邀请我们思考这一亘古难题——时间的本质。
     - name: 了不起的我
       description: 如何养成一个新习惯？如何让心智变得更成熟？如何拥有高质量的关系？ 如何走出人生的艰难时刻？
-复制代码
 ```
 
 ##### 3.4.8 `@value`(常用)
@@ -218,7 +217,6 @@ library:
 ```java
 @Value("${wuhan2020}")
 String wuhan2020;
-复制代码
 ```
 
 ##### 3.4.9 `@ConfigurationProperties`(常用)
@@ -403,3 +401,4 @@ public String[] selectImports(AnnotationMetadata annotationMetadata) {
 
 >`xxxAutoConfigurartion`: 自动配置类; 给容器中添加组件  
 >`xxxProperties`: 封装配置文件中相关属性
+
