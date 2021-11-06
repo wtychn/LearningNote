@@ -238,7 +238,7 @@ threshold = size * loadFactor
 
 #### 5.1.2 Java 8 
 
-链表长度大于等于 7 时转为红黑树。
+根据泊松分布概率计算得到，链表长度大于等于 8 时转为红黑树，红黑树节点小于等于 6 时退化为链表。
 
 ##### 1) hash()
 
@@ -265,7 +265,7 @@ if (root == null || (movable && (root.right == null || (rl = root.left) == null 
 }
 ```
 
-2. 在扩容时 low、high 两个 TreeNode 长度小于 6 时 会退化为链表。
+2. 在扩容时 low、high 两个 TreeNode 长度小于等于 6 时 会退化为链表。
 
 <img src="https://img-blog.csdnimg.cn/20181105181728652.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dvc2hpbWF4aWFvMQ==,size_16,color_FFFFFF,t_70" alt="hashmap流程图" style="zoom:50%;" />
 
